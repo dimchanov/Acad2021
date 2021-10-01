@@ -29,9 +29,9 @@ int main(int argc, char **argv){
     double *h_a, *h_b, *h_c;
     size_t bytes = n * sizeof(double);
 
-    h_a = (double *) malloc(bytes);
-    h_b = (double *) malloc(bytes);
-    h_c = (double *) malloc(bytes);
+    cudaMallocHost(&h_a, bytes);
+    cudaMallocHost(&h_b, bytes);
+    cudaMallocHost(&h_c, bytes);
     cudaHostRegister(h_a, bytes, 0);
     cudaHostRegister(h_b, bytes, 0);
     cudaHostRegister(h_c, bytes, 0);
@@ -65,17 +65,13 @@ int main(int argc, char **argv){
     cudaSetDevice(0);
     cudaMemcpyAsync(d_a1, &h_a[0], bytes_device, cudaMemcpyHostToDevice);
     cudaMemcpyAsync(d_b1, &h_b[0], bytes_device, cudaMemcpyHostToDevice);
-
     sum_vectors<<<gridSize, blockSize>>>(d_a1, d_b1, d_c1, n_device);
-
     cudaMemcpyAsync(&h_c[0], d_c1, bytes_device, cudaMemcpyDeviceToHost);
 
     cudaSetDevice(1);
     cudaMemcpyAsync(d_a2, &h_a[n_device], bytes_device, cudaMemcpyHostToDevice);
     cudaMemcpyAsync(d_b2, &h_b[n_device], bytes_device, cudaMemcpyHostToDevice);
-
     sum_vectors<<<gridSize, blockSize>>>(d_a2, d_b2, d_c2, n_device);
-
     cudaMemcpyAsync(&h_c[n_device], d_c2, bytes_device, cudaMemcpyDeviceToHost);
 
     cudaDeviceSynchronize();
@@ -105,9 +101,7 @@ int main(int argc, char **argv){
     cudaHostUnregister(h_a);
     cudaHostUnregister(h_b);
     cudaHostUnregister(h_c);
-    free(h_a);
-    free(h_b);
-    free(h_c);
+
 
     return 0;
 }

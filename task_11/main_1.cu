@@ -31,13 +31,13 @@ int main(int argc, char **argv){
 
     size_t bytes = n * sizeof(double);
 
-    h_a = (double *) malloc(bytes);
-    h_b = (double *) malloc(bytes);
-    h_c = (double *) malloc(bytes);
+    cudaMallocHost(&h_a, bytes);
+    cudaMallocHost(&h_b, bytes);
+    cudaMallocHost(&h_c, bytes);
 
     for (int i = 0; i < n; i++){
-        h_a[i] = sin(i) * sin(i);
-        h_b[i] = cos(i) * cos(i);
+        h_a[i] = i;
+        h_b[i] = 3 * i;
     }
 
     double *d_a, *d_b, *d_c;
@@ -90,10 +90,5 @@ int main(int argc, char **argv){
     cudaFree(d_a);
     cudaFree(d_b);
     cudaFree(d_c);
-
-    free(h_a);
-    free(h_b);
-    free(h_c);
-
     return 0;
 }
